@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=80"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "delos-lab"
+version = "0.1.0"
+description = "A local learning implementation of Virtual Consensus in Delos"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Sunghyun Kim" }]
+keywords = ["delos", "distributed-systems", "paxos", "shared-log", "virtual-consensus"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Education",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Education",
+  "Topic :: System :: Distributed Computing",
+]
+requires-python = ">=3.14,<3.15"
+dependencies = [
+  "aiosqlite>=0.21,<1",
+  "fastapi>=0.116,<1",
+  "httpx>=0.28,<1",
+  "pydantic>=2.11,<3",
+  "uvicorn>=0.35,<1",
+]
+
+[project.urls]
+Repository = "https://github.com/rscarrera27/delos-lab"
+Documentation = "https://github.com/rscarrera27/delos-lab/tree/main/docs"
+Issues = "https://github.com/rscarrera27/delos-lab/issues"
+Paper = "https://www.usenix.org/system/files/osdi20-balakrishnan.pdf"
+
+[project.scripts]
+delos-loglet-demo = "delos_lab.native_loglet.demo:main"
+delos-virtual-log-demo = "delos_lab.native_loglet.virtual_log_demo:main"
+delos-paxos-peer = "delos_lab.metastore.paxos.process:main"
+delos-paxos-demo = "delos_lab.metastore.paxos.demo:main"
+delos-kv-peer = "delos_lab.runtime.converged_process:main"
+delos-kv-demo = "delos_lab.kv.demo:main"
+delos-lab = "delos_lab.controller.process:main"
+
+[dependency-groups]
+dev = [
+  "hypothesis>=6.138,<7",
+  "mypy>=1.17,<2",
+  "pytest>=8.4,<10",
+  "pytest-asyncio>=1.1,<2",
+  "ruff>=0.12,<1",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+pythonpath = ["."]
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py314"
+line-length = 100
+
+[tool.mypy]
+python_version = "3.14"
+strict = true
+packages = ["delos_lab"]

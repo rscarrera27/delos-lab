@@ -1,0 +1,91 @@
+min_version = "2026.2.13"
+
+[settings.python]
+precompiled_flavor = "install_only_stripped"
+
+[tools]
+python = "3.14.7"
+node = "22.23.2"
+uv = "0.12.8"
+
+[env]
+UV_PYTHON = { value = "{{ tools.python.path }}", tools = true }
+UV_PYTHON_DOWNLOADS = "never"
+
+[tasks.setup]
+description = "Install Python and frontend dependencies, then build the SPA"
+run = [
+  "uv sync --locked",
+  "npm --prefix frontend ci",
+  "npm --prefix frontend run build",
+]
+
+[tasks.lock]
+description = "Update the Python dependency lockfile"
+run = "uv lock"
+
+[tasks.lab]
+description = "Run the local Delos lab"
+run = "uv run --locked delos-lab --runtime-dir .runtime/lab"
+
+[tasks.build]
+description = "Build the frontend production bundle"
+run = "npm --prefix frontend run build"
+
+[tasks.quality]
+description = "Run Python lint, formatting, typing, and frontend type checks"
+run = [
+  "uv run --locked ruff check src tests",
+  "uv run --locked ruff format --check src tests",
+  "uv run --locked mypy src",
+  "npm --prefix frontend run typecheck",
+]
+
+[tasks.pytest]
+description = "Run Python tests; extra arguments select a subset"
+run = "uv run --locked pytest -q"
+
+[tasks."test:frontend"]
+description = "Run frontend unit tests"
+run = "npm --prefix frontend run test:run"
+
+[tasks.test]
+description = "Run Python and frontend unit tests"
+run = [
+  { task = "pytest" },
+  { task = "test:frontend" },
+]
+
+[tasks.check]
+description = "Run the complete non-E2E validation suite"
+run = [
+  { task = "quality" },
+  { task = "test" },
+  { task = "build" },
+]
+
+[tasks."setup:e2e"]
+description = "Install the Chromium browser used by Playwright"
+dir = "frontend"
+run = "npx playwright install chromium"
+
+[tasks."test:e2e"]
+description = "Build the SPA and run browser end-to-end tests"
+dir = "frontend"
+run = "npm run e2e"
+
+[tasks."demo:loglet"]
+description = "Run the NativeLoglet demo"
+run = "uv run --locked delos-loglet-demo"
+
+[tasks."demo:virtual-log"]
+description = "Run the VirtualLog demo"
+run = "uv run --locked delos-virtual-log-demo"
+
+[tasks."demo:paxos"]
+description = "Run the Paxos MetaStore demo"
+run = "uv run --locked delos-paxos-demo"
+
+[tasks."demo:kv"]
+description = "Run the replicated KV demo"
+run = "uv run --locked delos-kv-demo"
